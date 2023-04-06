@@ -6,6 +6,7 @@ Civilization Simulation is a simulation that allows you to simulate a civilizati
 
 After the simulation is run, you can view the population per year in a neat graph.
 
+![Picture of changeable variables](changeable_variables.png)
 
 You can reach RangerRhino23 through one of these socials:
 
