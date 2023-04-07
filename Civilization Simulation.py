@@ -31,11 +31,13 @@ GENDERS = ['male','female']
 plot_y = []
 years = 1
 
+#Person Template
 class Person():
     def __init__(self, age):
         self.gender = random.choice(GENDERS)
         self.age = age
 
+#Harvests food for each worker every year cycle
 def harvest():
     global foodStorage
     workers = len([p for p in peopleDictionary if minWorkAge <= p.age <= maxWorkAge])
@@ -43,12 +45,15 @@ def harvest():
     foodStorage += food_return
     return food_return
 
+
+#Adds to the population
 def reproduction():
     births = len([p for p in peopleDictionary if p.gender == 'female' if minReproductionAge <= p.age <= maxReproductionAge if random.randint(0,5)==1])
     for i in range(births):
         peopleDictionary.append(Person(0))
     return births
 
+#Kills older ages
 def death():
     deaths = 0
     for person in peopleDictionary:
@@ -57,6 +62,7 @@ def death():
             deaths += 1
     return deaths
 
+#Randomly has a chance of killing people in a plague
 def plague():
     deaths = 0
     for person in peopleDictionary:
@@ -65,32 +71,41 @@ def plague():
             deaths += 1
     return deaths
 
+#Runs a year cycle
 def year(years):
+    #Runs a harvest
     harvestYeild = harvest()
     if showYearlyFoodYeild:
         print(f'Harvest Yeild for Year {years}: {harvestYeild}')
+
+    #Runs reproduction
     reproductionYeild = reproduction()
     if showYearlyReproduction:
         print(f'Reproduction Yeild for Year {years}: {reproductionYeild}')
+    
+    #Runs death
     deaths = death()
     if showYearlyDeath:
-        if deaths != 0:
-            print(f'Deaths for Year {years}: {deaths}')
+        print(f'Deaths for Year {years}: {deaths}')
 
+    #Runs plauge event if enabled
     if plagues:
         if random.randint(0,plagueChance)==1:
             deaths = plague()
             if showPlaugeDeath:
                 print(f'Plague! {deaths} people died during year {years} due to a plague!')
-    
-    for person in peopleDictionary:
-        person.age += 1
-    for person in peopleDictionary:
-        foodStorage - 1
+
+    #Ages everyone a year
+    ages = np.array([person.age for person in peopleDictionary])
+    np.add(ages, 1, out=ages)
+
+    #Gets the current population and stores it
     population = len(peopleDictionary)
     if showYearlyPopulation:
         print(f'Population for year {years}:{population}')
     plot_y.append(population)
+
+    #Executes if sim is over
     if years >= yearLimit:
         print('Simulation Done!')
         x=range(0,years)
@@ -105,14 +120,14 @@ def year(years):
     if pauseYearlyCycle:
         input('Press ENTER to continue... ')
     year(years)
-    
+
+#Setups the sim
 def beginSim():
     foodStorage = startingFood
     for x in range(startingPop):
         peopleDictionary.append(Person(random.randint(18,50)))
     print("Starting Simulation...")
     year(years)
-
 beginSim()
 
 #DEFAULT Variables for Starting Variables
