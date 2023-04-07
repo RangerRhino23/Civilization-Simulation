@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 import csv
 
 #Starting Variables (DEFAULTS at the end of script)
-startingPop = 50
-yearLimit = 350
+startingPop = 500
+yearLimit = 200
 foodYeild = 1
 foodStorage = 0
 startingFood = 0
@@ -13,7 +13,8 @@ minWorkAge = 8
 maxWorkAge = 80
 minReproductionAge = 18
 maxReproductionAge = 35
-maxAge = 85
+minDeathAge = 60
+maxDeathAge = 85
 plagues = True
 plagueChance = 20
 plagueDeathChance = 20
@@ -22,45 +23,36 @@ showYearlyPopulation = False
 showYearlyFoodYeild = False
 showYearlyReproduction = False
 showYearlyDeath = False
-showPlaugeDeath = True
+showPlaugeDeath = False
 pauseYearlyCycle = False
 #DO NOT CHANGE
 peopleDictionary = []
-genders = ['male','female']
+GENDERS = ['male','female']
 plot_y = []
 years = 1
 
 class Person():
     def __init__(self, age):
-        self.gender = random.choice(genders)
+        self.gender = random.choice(GENDERS)
         self.age = age
 
 def harvest():
     global foodStorage
-    workers = 0
-    for person in peopleDictionary:
-        if person.age >= minWorkAge:
-            if person.age <= maxWorkAge:
-                workers += 1
+    workers = len([p for p in peopleDictionary if minWorkAge <= p.age <= maxWorkAge])
     food_return = workers * foodYeild
     foodStorage += food_return
     return food_return
 
 def reproduction():
-    births = 0
-    for person in peopleDictionary:
-        if person.gender == 'female':
-            if person.age >= minReproductionAge:
-                if person.age <= maxReproductionAge:
-                    if random.randint(0,5)==1:
-                        peopleDictionary.append(Person(0))
-                        births += 1
+    births = len([p for p in peopleDictionary if p.gender == 'female' if minReproductionAge <= p.age <= maxReproductionAge if random.randint(0,5)==1])
+    for i in range(births):
+        peopleDictionary.append(Person(0))
     return births
 
 def death():
     deaths = 0
     for person in peopleDictionary:
-        if person.age >= maxAge:
+        if person.age >= random.randint(minDeathAge,maxDeathAge):
             peopleDictionary.remove(person)
             deaths += 1
     return deaths
@@ -82,7 +74,8 @@ def year(years):
         print(f'Reproduction Yeild for Year {years}: {reproductionYeild}')
     deaths = death()
     if showYearlyDeath:
-        print(f'Deaths for Year {years}: {deaths}')
+        if deaths != 0:
+            print(f'Deaths for Year {years}: {deaths}')
 
     if plagues:
         if random.randint(0,plagueChance)==1:
